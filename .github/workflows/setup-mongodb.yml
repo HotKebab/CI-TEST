@@ -1,0 +1,21 @@
+name: Setup MongoDB
+
+on:
+  workflow_dispatch: # Permite ejecutar este workflow manualmente
+
+jobs:
+  setup-mongodb:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create Docker network
+        run: docker network create todo-network
+
+      - name: Run MongoDB container
+        run: |
+          docker run --rm -d --name mongodb \
+                     --network todo-network \
+                     -p 27017:27017 mongo:latest
+
+      - name: Check MongoDB status
+        run: docker logs mongodb
