@@ -24,11 +24,11 @@ jobs:
         run: |
           docker run --rm -d --name mongodb \
                      --network todo-network \
-                     -p 27017:27017 mongo:latest
+                     -p 27017:27017 mongo:5.0
 
       - name: Test MongoDB connection
         run: |
-          docker run --rm --network todo-network mongo:4.4.10-bionic \
+          docker run --rm --network todo-network mongo:5.0 \
                      mongo --host mongodb --eval 'db.runCommand({ ping: 1 })'
 
       - name: Run Application container
