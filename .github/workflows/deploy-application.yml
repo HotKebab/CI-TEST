@@ -1,7 +1,7 @@
 name: Deploy Application
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -16,14 +16,21 @@ jobs:
     steps:
       - name: Pull Docker image from Docker Hub
         run: docker pull mynegret/todo-app-projet:latest
-        
+
       - name: Ensure todo-network exists
         run: docker network ls | grep todo-network || docker network create todo-network
 
+      - name: Run MongoDB container
+        run: |
+          docker run --rm -d --name mongodb \
+                     --network todo-network \
+                     -p 27017:27017 mongo:latest
+
       - name: Test MongoDB connection
         run: |
-          docker run --rm --network todo-network mongo:latest mongo --host mongodb --eval 'db.runCommand({ ping: 1 })'
-        
+          docker run --rm --network todo-network mongo:4.4.10-bionic \
+                     mongo --host mongodb --eval 'db.runCommand({ ping: 1 })'
+
       - name: Run Application container
         run: |
           docker run --rm --network todo-network \
@@ -33,7 +40,6 @@ jobs:
                      -e JWT_PUBLIC_KEY_PATH=/app/backend/env/keys/jwtRS256.key.pub \
                      -e PORT=3000 \
                      -p 3000:3000 mynegret/todo-app-projet:latest
-
 
       - name: Check Application logs
         run: docker logs $(docker ps -q --filter "ancestor=mynegret/todo-app-projet:latest")
