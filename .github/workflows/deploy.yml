@@ -39,16 +39,22 @@ jobs:
     - name: Push Backend Docker Image
       run: |
         docker push ${DOCKERHUB_USERNAME}/todo-backend:latest
+      env:
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
 
     # Build Frontend Image
     - name: Build Frontend Docker Image
       run: |
         docker build Code/frontend -f Code/frontend/dockerfile -t ${DOCKERHUB_USERNAME}/todo-frontend:latest
+      env:
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
 
     # Push Frontend Image
     - name: Push Frontend Docker Image
       run: |
         docker push ${DOCKERHUB_USERNAME}/todo-frontend:latest
+      env:
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
 
   validate-deployment:
     name: Validate Deployment
