@@ -19,6 +19,10 @@ jobs:
         
       - name: Ensure todo-network exists
         run: docker network ls | grep todo-network || docker network create todo-network
+
+      - name: Test MongoDB connection
+        run: |
+          docker run --rm --network todo-network mongo:latest mongo --host mongodb --eval 'db.runCommand({ ping: 1 })'
         
       - name: Run Application container
         run: |
@@ -29,6 +33,7 @@ jobs:
                      -e JWT_PUBLIC_KEY_PATH=/app/backend/env/keys/jwtRS256.key.pub \
                      -e PORT=3000 \
                      -p 3000:3000 mynegret/todo-app-projet:latest
+
 
       - name: Check Application logs
         run: docker logs $(docker ps -q --filter "ancestor=mynegret/todo-app-projet:latest")
