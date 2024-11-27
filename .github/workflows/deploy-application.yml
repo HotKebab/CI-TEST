@@ -1,0 +1,31 @@
+name: Deploy Application
+
+on:
+  workflow_dispatch: 
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy-application:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull Docker image from Docker Hub
+        run: docker pull mynegret/todo-app-projet:latest
+
+      - name: Run Application container
+        run: |
+          docker run --rm --network todo-network \
+                     -e DB_URL=mongodb://mongodb:27017/db_to-do \
+                     -e NODE_ENV=production \
+                     -e JWT_PRIVATE_KEY_PATH=/app/backend/env/keys/jwtRS256.key \
+                     -e JWT_PUBLIC_KEY_PATH=/app/backend/env/keys/jwtRS256.key.pub \
+                     -e PORT=3000 \
+                     -p 3000:3000 mynegret/todo-app-projet:latest
+
+      - name: Check Application logs
+        run: docker logs $(docker ps -q --filter "ancestor=mynegret/todo-app-projet:latest")
