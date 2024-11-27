@@ -16,7 +16,10 @@ jobs:
     steps:
       - name: Pull Docker image from Docker Hub
         run: docker pull mynegret/todo-app-projet:latest
-
+        
+      - name: Ensure todo-network exists
+        run: docker network ls | grep todo-network || docker network create todo-network
+        
       - name: Run Application container
         run: |
           docker run --rm --network todo-network \
