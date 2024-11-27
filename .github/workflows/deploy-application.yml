@@ -26,10 +26,13 @@ jobs:
                      --network todo-network \
                      -p 27017:27017 mongo:5.0
 
-      - name: Test MongoDB connection
+      - name: Wait for MongoDB to be ready
         run: |
-          docker run --rm --network todo-network mongo:5.0 \
-                     mongo --host mongodb --eval 'db.runCommand({ ping: 1 })'
+          until docker run --rm --network todo-network mongo:5.0 \
+                 mongo --host mongodb --eval 'db.runCommand({ ping: 1 })'; do
+            echo "Waiting for MongoDB to be ready..."
+            sleep 5
+          done
 
       - name: Run Application container
         run: |
